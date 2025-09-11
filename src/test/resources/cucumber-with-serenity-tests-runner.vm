@@ -1,0 +1,50 @@
+#parse("/array.java.vm")
+#if ($packageName)
+package $packageName;
+#end##
+
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import io.cucumber.junit.CucumberOptions;
+import net.serenitybdd.cucumber.CucumberWithSerenity;
+import net.thucydides.model.environment.SystemEnvironmentVariables;
+
+@RunWith(CucumberWithSerenity.class)
+@CucumberOptions(
+    dryRun = false,
+    features = {"${featureFile}"},
+    plugin = #stringArray($plugins),
+    monochrome = $monochrome,
+    #*
+    #if (!$featureFile.contains(".feature:") && $tags)
+    tags = #stringArray($tags),
+    #end
+    *#
+    glue = #stringArray($glue),
+    snippets = CucumberOptions.SnippetType.CAMELCASE
+)
+public class $className {
+
+    private static final Logger logger = LoggerFactory.getLogger("$className"+".class");
+       
+    @BeforeClass
+    public static void setUp() {
+        // Loads serenity.conf
+        SystemEnvironmentVariables.createEnvironmentVariables();
+        logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+        logger.info(">>>>>>>>>>>>>>>>>>> Starting the Test Suite through $className !!!!! >>>>>>>>>");
+        logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+    }
+    
+    @AfterClass
+    public static void tearDown() {
+        logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+        logger.info(">>>>>>>>>>>>>>>>>>> Ending the Test Suite through $className !!!!! >>>>>>>>>");
+        logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+    }
+}

@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.consoleconnect.pccwglobal</groupId>
+    <artifactId>web-application-login-functionality</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <properties>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <maven.surefire.plugin.version>3.5.3</maven.surefire.plugin.version>
+        <maven.failsafe.plugin.version>3.5.3</maven.failsafe.plugin.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <serenity.version>4.2.26</serenity.version>
+        <selenium.version>4.35.0</selenium.version>
+        <junit-bom.version>5.11.3</junit-bom.version>
+        <restAssured.version>5.5.2</restAssured.version>
+        <commons-lang.version>3.18.0</commons-lang.version>
+        <logback.version>1.5.18</logback.version>
+        <parallel.tests>1</parallel.tests>
+        <rerun.tests>1</rerun.tests>
+        <skipTests>true</skipTests>
+        <webdriver.base.url/>
+    </properties>
+    <profiles>
+        <profile>
+            <id>at</id>
+            <properties>
+                <skipTests>false</skipTests>
+            </properties>
+        </profile>
+    </profiles>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>${junit-bom.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>net.serenity-bdd</groupId>
+            <artifactId>serenity-core</artifactId>
+            <version>${serenity.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.serenity-bdd</groupId>
+            <artifactId>serenity-model</artifactId>
+            <version>${serenity.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.serenity-bdd</groupId>
+            <artifactId>serenity-junit5</artifactId>
+            <version>${serenity.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.serenity-bdd</groupId>
+            <artifactId>serenity-ensure</artifactId>
+            <version>${serenity.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.serenity-bdd</groupId>
+            <artifactId>serenity-cucumber</artifactId>
+            <version>${serenity.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.vintage</groupId>
+            <artifactId>junit-vintage-engine</artifactId>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.hamcrest</groupId>
+                    <artifactId>hamcrest-core</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${commons-lang.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven.surefire.plugin.version}</version>
+                <configuration>
+                    <skip>true</skip>
+                    <useModulePath>false</useModulePath>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>${maven.failsafe.plugin.version}</version>
+                <configuration>
+                    <includes>
+                        <include>**/TestsParallelRunners*.java</include>
+                    </includes>
+                    <systemPropertyVariables>
+                        <webdriver.base.url>${webdriver.base.url}</webdriver.base.url>
+                    </systemPropertyVariables>
+                    <rerunFailingTestsCount>${rerun.tests}</rerunFailingTestsCount>
+                    <parallel>all</parallel>
+                    <forkCount>${parallel.tests}</forkCount>
+                    <reuseForks>true</reuseForks>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.github.temyers</groupId>
+                <artifactId>cucumber-jvm-parallel-plugin</artifactId>
+                <version>5.0.0</version>
+                <executions>
+                    <execution>
+                        <id>generateRunners</id>
+                        <phase>generate-test-sources</phase>
+                        <goals>
+                            <goal>generateRunners</goal>
+                        </goals>
+                        <configuration>
+                            <!-- Mandatory. List of package names to scan for glue code. -->
+                            <glue>
+                                <package>com.consoleconnect.pccwglobal.steps</package>
+                            </glue>
+                            <!-- The directory, which must be in the root of the runtime classpath, containing feature files. -->
+                            <featuresDirectory>src/test/resources/features</featuresDirectory>
+                            <!-- Directory where the cucumber report files shall be written. -->
+                            <cucumberOutputDir>target/reports/cucumber</cucumberOutputDir>
+                            <!-- List of cucumber plugins. -->
+                            <plugins>
+                                <plugin>
+                                    <!-- The available options are junit, testng, html, pretty, json, usage and rerun -->
+                                    <name>pretty</name>
+                                </plugin>
+                                <plugin>
+                                    <!--The available options are junit, testng, html, pretty, json, usage and rerun -->
+                                    <name>html</name>
+                                    <!--Optional file extension. For build in cucumber plugins a sensible default is provided. -->
+                                    <extension>.html</extension>
+                                    <!--Optional output directory. Overrides cucumberOutputDirectory. Usefull when different
+                                    plugins create files with the same extension-->
+                                    <outputDirectory>target/reports/cucumber</outputDirectory>
+                                </plugin>
+                            </plugins>
+
+                            <!-- The tags to run, maps to CucumberOptions.tags property. Default is no tags. -->
+                            <!--<tags>-->
+                            <!--    <tag>${tags}</tag>-->
+                            <!--</tags>-->
+                            <!-- CucumberOptions.monochrome property -->
+                            <monochrome>true</monochrome>
+                            <!-- Generate TestNG runners instead of JUnit ones. -->
+                            <useTestNG>false</useTestNG>
+                            <!-- The naming scheme to use for the generated test classes. One
+                            of ['simple', 'feature-title', 'pattern'] -->
+                            <namingScheme>pattern</namingScheme>
+                            <!-- The class naming pattern to use. Only required/used if naming scheme is 'pattern'. -->
+                            <namingPattern>TestsParallelRunners{c}</namingPattern>
+                            <!-- One of [SCENARIO, FEATURE]. SCENARIO generates one runner per
+                            scenario. FEATURE generates a runner per feature. -->
+                            <parallelScheme>FEATURE</parallelScheme>
+                            <!-- Specify a custom template for the generated sources (this is a path relative to the project base directory) -->
+                            <customVmTemplate>src/test/resources/cucumber-with-serenity-tests-runner.vm</customVmTemplate>
+                            <!-- Specify a custom package name for generated sources. Default is no package.-->
+                            <packageName>com.consoleconnect.pccwglobal</packageName>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>net.serenity-bdd.maven.plugins</groupId>
+                <artifactId>serenity-maven-plugin</artifactId>
+                <version>${serenity.version}</version>
+                <configuration>
+                    <!--suppress UnresolvedMavenProperty -->
+                    <tags>${tags}</tags>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>serenity-reports</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>aggregate</goal>
+                            <goal>reports</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
