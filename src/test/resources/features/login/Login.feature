@@ -74,9 +74,9 @@ Feature: User Login
   Scenario: XSS attempt
     Given I am on the Login page
     When I login with the following credentials:
-      | Field    | Value                     |
-      | Username | <script>alert(1)</script> |
-      | Password | Password123               |
+      | Field    | Value                                      |
+      | Username | <script>/*XSS-TOKEN: TOKEN_123 */</script> |
+      | Password | Password123                                |
     Then I should see the error message "Your username is invalid!"
 
   @feature:login @id:login-009 @scenario:long_input @testing:exploratory @type:negative_test
