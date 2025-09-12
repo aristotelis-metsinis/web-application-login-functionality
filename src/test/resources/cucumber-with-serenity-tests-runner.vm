@@ -5,7 +5,6 @@ package $packageName;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Rule;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +13,31 @@ import io.cucumber.junit.CucumberOptions;
 import net.serenitybdd.cucumber.CucumberWithSerenity;
 import net.thucydides.model.environment.SystemEnvironmentVariables;
 
+/**
+ * VM Runner template for executing Cucumber feature files with Serenity BDD.
+ *
+ * This class is generated via a Velocity Template (VM) and integrates:
+ * - Serenity BDD framework
+ * - Cucumber for BDD-style feature execution
+ * - JUnit for test suite lifecycle management
+ *
+ * Responsibilities:
+ * - Configure feature files, glue paths, and Cucumber options dynamically
+ * - Initialize Serenity environment before suite execution
+ * - Log test suite start and end events
+ * - Serve as a central runner for automated acceptance and regression tests
+ *
+ * Usage:
+ * - Extend this template for any feature file execution by providing:
+ *   * $className - the generated runner class name
+ *   * $featureFile - path to the feature file(s)
+ *   * $glue - packages containing step definitions
+ *   * $plugins - reporting and logging plugins
+ *   * $monochrome - console output formatting
+ *
+ * Author: QA Automation Team
+ * Version: 1.0.0
+ */
 @RunWith(CucumberWithSerenity.class)
 @CucumberOptions(
     dryRun = false,
@@ -29,22 +53,35 @@ import net.thucydides.model.environment.SystemEnvironmentVariables;
     snippets = CucumberOptions.SnippetType.CAMELCASE
 )
 public class $className {
-
+    /** Logger instance for suite-level logging. */
     private static final Logger logger = LoggerFactory.getLogger("$className"+".class");
-       
+
+    /**
+     * Suite-level setup executed once before all feature scenarios.
+     *
+     * Responsibilities:
+     * - Loads Serenity environment variables
+     * - Logs the start of the test suite
+     */
     @BeforeClass
     public static void setUp() {
-        // Loads serenity.conf
         SystemEnvironmentVariables.createEnvironmentVariables();
-        logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-        logger.info(">>>>>>>>>>>>>>>>>>> Starting the Test Suite through $className !!!!! >>>>>>>>>");
-        logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+        logger.info("==================================================================================");
+        logger.info(">>>>>>>>>>>>>>>>>>> Starting the Test Suite through $className !!!!! >>>>>>>>>>");
+        logger.info("==================================================================================");
     }
-    
+
+    /**
+     * Suite-level teardown executed once after all feature scenarios.
+     *
+     * Responsibilities:
+     * - Logs the end of the test suite
+     * - Allows for any final cleanup or reporting hooks if needed in the future
+     */
     @AfterClass
     public static void tearDown() {
-        logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-        logger.info(">>>>>>>>>>>>>>>>>>> Ending the Test Suite through $className !!!!! >>>>>>>>>");
-        logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+        logger.info("==================================================================================");
+        logger.info(">>>>>>>>>>>>>>>>>>> Ending the Test Suite through $className !!!!! >>>>>>>>>>");
+        logger.info("==================================================================================");
     }
 }
