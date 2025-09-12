@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     parameters {
-        string(name: 'GIT_BRANCH', defaultValue: 'master', description: 'Git branch to build')
+        string(name: 'GIT_BRANCH', defaultValue: 'main', description: 'Git branch to build')
         string(name: 'CUCUMBER_TAGS', defaultValue: '', description: 'Optional Cucumber tags filter, e.g. @id:login-001')
         choice(name: 'ENVIRONMENT', choices: ['headless-chrome', 'headless-firefox', 'default-chrome', 'default-firefox'], description: 'Serenity environment')
     }
