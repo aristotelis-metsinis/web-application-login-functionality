@@ -34,6 +34,7 @@ web-application-login-functionality
  │	            ├── cucumber-with-serenity-tests-runner.vm    # VM template for runners
  │              └── serenity.conf                             # Serenity configuration file
  ├── .gitignore                                               # Git ignore rules
+ ├── Jenkinsfile_LoginFunctionality                           # Builds the project, runs Serenity tests, and publishes HTML reports
  ├── pom.xml                                                  # Maven project configuration
  └── README.md                                                # Project overview / instructions
 ```

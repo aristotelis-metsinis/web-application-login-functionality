@@ -1,0 +1,106 @@
+pipeline {
+    agent any
+
+    parameters {
+        string(name: 'GIT_BRANCH', defaultValue: 'master', description: 'Git branch to build')
+        string(name: 'CUCUMBER_TAGS', defaultValue: '', description: 'Optional Cucumber tags filter, e.g. @id:login-001')
+        choice(name: 'ENVIRONMENT', choices: ['headless-chrome', 'headless-firefox', 'default-chrome', 'default-firefox'], description: 'Serenity environment')
+    }
+
+    environment {
+        MAVEN_OPTS = "-Dmaven.repo.local=${env.HOME}/.m2/repository"
+    }
+
+    options {
+        skipDefaultCheckout(true)                      // Prevents automatic SCM checkout
+        buildDiscarder(logRotator(numToKeepStr: '10')) // Keep last 10 builds only
+        timestamps()                                   // Timestamp console output
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                script {
+                    echo "Starting checkout of branch: '${params.GIT_BRANCH}' from GitHub repo"
+                    try {
+                        git branch: "${params.GIT_BRANCH}",
+                            url: 'https://github.com/aristotelis-metsinis/web-application-login-functionality.git'
+                        echo "Checkout successful."
+                    } catch (err) {
+                        error "Git checkout failed: ${err}"
+                    }
+                }
+            }
+        }
+
+        stage('Build') {
+            steps {
+                script {
+                    echo "Starting Maven build (clean install, skipping tests)..."
+                    try {
+                        timeout(time: 5, unit: 'MINUTES') {
+                            def cmd = "mvn -B clean install -DskipTests"
+                            def rc = isUnix() ? sh(script: cmd, returnStatus: true) : bat(script: cmd, returnStatus: true)
+                            if (rc != 0) {
+                                error "Maven build failed with exit code: ${rc}"
+                            }
+                        }
+                        echo "Build completed successfully."
+                    } catch (err) {
+                        error "Build stage failed: ${err}"
+                    }
+                }
+            }
+        }
+
+        stage('Run Serenity Tests') {
+            steps {
+                script {
+                    def tagsArg = params.CUCUMBER_TAGS?.trim() ? "-Dcucumber.filter.tags=\"${params.CUCUMBER_TAGS}\"" : ""
+                    echo "Running Serenity tests with environment=${params.ENVIRONMENT} and tags=${params.CUCUMBER_TAGS}"
+                    try {
+                        timeout(time: 60, unit: 'MINUTES') {
+                            def cmd = "mvn -B -P at -Denvironment=${params.ENVIRONMENT} ${tagsArg} verify"
+                            def rc = isUnix() ? sh(script: cmd, returnStatus: true) : bat(script: cmd, returnStatus: true)
+                            if (rc != 0) {
+                                error "Serenity tests failed with exit code: ${rc}"
+                            }
+                        }
+                        echo "Serenity tests completed successfully."
+                    } catch (err) {
+                        error "Test execution failed: ${err}"
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Publishing reports...'
+
+            // Publish Serenity Illustrated Report (index.html)
+            publishHTML([
+                allowMissing: false,
+                alwaysLinkToLastBuild: false,
+                keepAll: true,
+                reportDir: 'target/site/serenity/',
+                reportFiles: 'index.html',
+                reportName: 'Serenity Illustrated Report',
+                reportTitles: ''
+            ])
+        }
+
+        success {
+            echo 'Pipeline finished SUCCESSFULLY: Build and tests passed.'
+        }
+
+        failure {
+            echo 'Pipeline FAILED: Build or tests did not pass.'
+        }
+
+        aborted {
+            echo 'Pipeline was ABORTED.'
+        }
+    }
+}
