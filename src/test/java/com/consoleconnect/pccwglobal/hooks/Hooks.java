@@ -45,7 +45,7 @@ public class Hooks {
      *
      * @throws RuntimeException if driver initialization fails
      */
-    @Before
+    @Before("@feature:login")
     public void setUp() {
         logger.info("Initializing WebDriver for new test scenario");
 
@@ -71,7 +71,7 @@ public class Hooks {
      *
      * @param scenario The completed Cucumber scenario, containing execution results
      */
-    @After
+    @After("@feature:login")
     public void tearDown(Scenario scenario) {
         logger.info("Scenario '{}' completed with status: {}", scenario.getName(), scenario.getStatus());
 
